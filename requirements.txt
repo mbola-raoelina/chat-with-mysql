@@ -1,0 +1,5 @@
+# Main requirements for Secure AI SQL Chat
+# This file includes cloud dependencies for easy deployment
+
+# Include cloud requirements
+-r new_version/requirements_cloud.txt 
