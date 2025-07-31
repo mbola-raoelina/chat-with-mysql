@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 # Page configuration
 st.set_page_config(
-    page_title="Secure AI SQL Chat - PostgreSQL",
+    page_title="Secure AI SQL Chat - PostgreSQL (Pooler)",
     page_icon="🔒",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -97,7 +97,7 @@ class AppConfig:
         self.openai_api_key = os.getenv('OPENAI_API_KEY')
         self.groq_api_key = os.getenv('GROQ_API_KEY')
         
-        # Supabase configuration (update these with your actual values)
+        # Supabase configuration with session pooler (IPv4 compatible)
         self.supabase_config = {
             'host': os.getenv('SUPABASE_HOST', 'db.your-project-ref.supabase.co'),
             'port': os.getenv('SUPABASE_PORT', '5432'),
@@ -114,15 +114,29 @@ class DatabaseManager:
         self.db = None
     
     def connect(self):
-        """Establish database connection"""
+        """Establish database connection using session pooler"""
         try:
-            # Build connection string for PostgreSQL with IPv4 preference
-            connection_string = f"postgresql://{self.config.supabase_config['user']}:{self.config.supabase_config['password']}@{self.config.supabase_config['host']}:{self.config.supabase_config['port']}/{self.config.supabase_config['database']}"
+            # Use session pooler connection (IPv4 compatible)
+            # Format: postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres
+            host = self.config.supabase_config['host']
+            user = self.config.supabase_config['user']
+            password = self.config.supabase_config['password']
+            database = self.config.supabase_config['database']
             
-            # Add connection parameters to prefer IPv4
+            # Extract project ref from host for pooler
+            if 'supabase.co' in host:
+                project_ref = host.replace('db.', '').replace('.supabase.co', '')
+                # Use session pooler connection
+                pooler_host = f"aws-0-us-east-1.pooler.supabase.com"
+                connection_string = f"postgresql://{user}.{project_ref}:{password}@{pooler_host}:6543/{database}"
+            else:
+                # Fallback to direct connection
+                connection_string = f"postgresql://{user}:{password}@{host}:{self.config.supabase_config['port']}/{database}"
+            
+            # Add connection parameters
             connection_params = {
-                'connect_timeout': 10,
-                'application_name': 'streamlit_app'
+                'connect_timeout': 15,
+                'application_name': 'streamlit_app_pooler'
             }
             
             self.db = SQLDatabase.from_uri(
@@ -131,7 +145,7 @@ class DatabaseManager:
                 sample_rows_in_table_info=2,
                 **connection_params
             )
-            logger.info("Database connection established successfully")
+            logger.info("Database connection established successfully using pooler")
             return True
         except Exception as e:
             logger.error(f"Database connection failed: {e}")
@@ -223,7 +237,7 @@ def main():
     
     # Sidebar configuration
     st.sidebar.title("🔒 Secure AI SQL Chat")
-    st.sidebar.markdown("**PostgreSQL + Supabase Version**")
+    st.sidebar.markdown("**PostgreSQL + Supabase (Pooler) Version**")
     
     # Provider selection
     provider = st.sidebar.selectbox(
@@ -248,7 +262,7 @@ def main():
     
     db_manager = DatabaseManager(config)
     if db_manager.connect():
-        st.sidebar.success("✅ Connected to Supabase")
+        st.sidebar.success("✅ Connected to Supabase (Pooler)")
         
         # Show schema info
         with st.sidebar.expander("📋 Database Schema"):
@@ -373,6 +387,7 @@ def main():
     - ✅ Query validation
     - ✅ Sensitive data masking
     - ✅ Cloud deployment ready
+    - ✅ IPv4 compatible pooler
     """)
 
 if __name__ == "__main__":
