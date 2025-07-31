@@ -119,17 +119,10 @@ class DatabaseManager:
             # Build connection string for PostgreSQL with IPv4 preference
             connection_string = f"postgresql://{self.config.supabase_config['user']}:{self.config.supabase_config['password']}@{self.config.supabase_config['host']}:{self.config.supabase_config['port']}/{self.config.supabase_config['database']}"
             
-            # Add connection parameters to prefer IPv4
-            connection_params = {
-                'connect_timeout': 10,
-                'application_name': 'streamlit_app'
-            }
-            
             self.db = SQLDatabase.from_uri(
                 connection_string,
                 include_tables=None,  # Include all tables
-                sample_rows_in_table_info=2,
-                **connection_params
+                sample_rows_in_table_info=2
             )
             logger.info("Database connection established successfully")
             return True

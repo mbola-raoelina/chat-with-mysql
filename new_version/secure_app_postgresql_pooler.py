@@ -133,17 +133,10 @@ class DatabaseManager:
                 # Fallback to direct connection
                 connection_string = f"postgresql://{user}:{password}@{host}:{self.config.supabase_config['port']}/{database}"
             
-            # Add connection parameters
-            connection_params = {
-                'connect_timeout': 15,
-                'application_name': 'streamlit_app_pooler'
-            }
-            
             self.db = SQLDatabase.from_uri(
                 connection_string,
                 include_tables=None,  # Include all tables
-                sample_rows_in_table_info=2,
-                **connection_params
+                sample_rows_in_table_info=2
             )
             logger.info("Database connection established successfully using pooler")
             return True
