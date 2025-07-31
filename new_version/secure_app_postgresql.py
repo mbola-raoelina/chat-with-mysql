@@ -114,17 +114,31 @@ class DatabaseManager:
         self.db = None
     
     def connect(self):
-        """Establish database connection"""
+        """Establish database connection using session pooler"""
         try:
-            # Build connection string for PostgreSQL with IPv4 preference
-            connection_string = f"postgresql://{self.config.supabase_config['user']}:{self.config.supabase_config['password']}@{self.config.supabase_config['host']}:{self.config.supabase_config['port']}/{self.config.supabase_config['database']}"
+            # Use session pooler connection (IPv4 compatible)
+            # Format: postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres
+            host = self.config.supabase_config['host']
+            user = self.config.supabase_config['user']
+            password = self.config.supabase_config['password']
+            database = self.config.supabase_config['database']
+            
+            # Extract project ref from host for pooler
+            if 'supabase.co' in host:
+                project_ref = host.replace('db.', '').replace('.supabase.co', '')
+                # Use session pooler connection (IPv4 compatible)
+                pooler_host = f"aws-0-us-east-1.pooler.supabase.com"
+                connection_string = f"postgresql://{user}.{project_ref}:{password}@{pooler_host}:6543/{database}"
+            else:
+                # Fallback to direct connection
+                connection_string = f"postgresql://{user}:{password}@{host}:{self.config.supabase_config['port']}/{database}"
             
             self.db = SQLDatabase.from_uri(
                 connection_string,
                 include_tables=None,  # Include all tables
                 sample_rows_in_table_info=2
             )
-            logger.info("Database connection established successfully")
+            logger.info("Database connection established successfully using pooler")
             return True
         except Exception as e:
             logger.error(f"Database connection failed: {e}")
