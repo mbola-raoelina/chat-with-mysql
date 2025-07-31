@@ -1,0 +1,113 @@
+# AI SQL Chat Application Configuration
+
+# LLM Provider Configurations
+llm_providers:
+  groq:
+    provider: "groq"
+    model: "mixtral-8x7b-32768"
+    temperature: 0
+    api_key_env: "GROQ_API_KEY"
+    
+  openai:
+    provider: "openai"
+    model: "gpt-4o-mini"
+    temperature: 0
+    api_key_env: "OPENAI_API_KEY"
+    base_url: null  # Use OpenAI's default URL
+    
+  ollama:
+    provider: "ollama"
+    model: "llama2"
+    temperature: 0
+    base_url: "http://localhost:11434"
+    api_key_env: null
+
+# Security Configuration
+security:
+  enable_sanitization: true
+  enable_validation: true
+  enable_logging: true
+  
+  # Sensitive data patterns to mask
+  sensitive_patterns:
+    - '\b\d{4}[- ]?\d{4}[- ]?\d{4}[- ]?\d{4}\b'  # Credit card numbers
+    - '\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'  # Email addresses
+    - '\b\d{3}-\d{2}-\d{4}\b'  # SSN
+    - '\b\d{10,11}\b'  # Phone numbers
+    - '\b[A-Z]{2}\d{2}[A-Z0-9]{10,30}\b'  # IBAN
+  
+  # Dangerous SQL operations to block
+  blocked_operations:
+    - "DROP"
+    - "DELETE"
+    - "TRUNCATE"
+    - "ALTER"
+    - "CREATE"
+    - "INSERT"
+    - "UPDATE"
+    - "GRANT"
+    - "REVOKE"
+  
+  # Sensitive table/column names to filter
+  sensitive_tables:
+    - "users"
+    - "passwords"
+    - "credit_cards"
+    - "ssn"
+    - "personal_data"
+    - "financial_data"
+  
+  sensitive_columns:
+    - "password"
+    - "ssn"
+    - "credit_card"
+    - "email"
+    - "phone"
+    - "address"
+    - "salary"
+    - "bank_account"
+
+# Database Configuration
+database:
+  default_host: "localhost"
+  default_port: "3306"
+  default_user: "root"
+  default_database: "Chinook"
+  
+  # Connection pool settings
+  pool_size: 10
+  max_overflow: 20
+  pool_timeout: 30
+  pool_recycle: 3600
+
+# Application Settings
+app:
+  default_llm_provider: "groq"
+  max_query_results: 1000
+  enable_caching: true
+  cache_ttl: 3600  # 1 hour
+  
+  # UI Settings
+  page_title: "AI SQL Chat"
+  page_icon: ":speech_balloon:"
+  sidebar_width: 300
+  
+  # Logging
+  log_level: "INFO"
+  log_file: "app.log"
+
+# Rate Limiting
+rate_limiting:
+  enabled: true
+  max_requests_per_minute: 60
+  max_requests_per_hour: 1000
+
+# Monitoring
+monitoring:
+  enabled: true
+  metrics_endpoint: "/metrics"
+  health_check_endpoint: "/health"
+  
+  # Performance thresholds
+  max_query_execution_time: 30  # seconds
+  max_response_generation_time: 60  # seconds 

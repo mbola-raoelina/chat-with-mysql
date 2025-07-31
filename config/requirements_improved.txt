@@ -1,0 +1,53 @@
+# Core Dependencies
+streamlit>=1.28.0
+python-dotenv>=1.0.0
+
+# LangChain and AI/ML
+langchain>=0.1.0
+langchain-core>=0.1.0
+langchain-community>=0.0.20
+langchain-openai>=0.0.5
+langchain-groq>=0.0.3
+
+# Database
+mysql-connector-python>=8.0.33
+sqlalchemy>=2.0.0
+
+# LLM Providers
+openai>=1.0.0
+groq>=0.4.0
+ollama>=0.1.0
+
+# Security and Validation
+cryptography>=41.0.0
+python-jose>=3.3.0
+passlib>=1.7.4
+
+# Configuration and Logging
+pyyaml>=6.0
+python-json-logger>=2.0.0
+
+# Monitoring and Performance
+prometheus-client>=0.17.0
+psutil>=5.9.0
+
+# Caching
+redis>=4.5.0
+cachetools>=5.3.0
+
+# Rate Limiting
+slowapi>=0.1.8
+
+# Testing
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+
+# Development
+black>=23.0.0
+flake8>=6.0.0
+mypy>=1.5.0
+
+# Optional: For advanced features
+# streamlit-monaco>=0.0.1  # For code editing
+# plotly>=5.15.0  # For data visualization
+# pandas>=2.0.0  # For data manipulation 
