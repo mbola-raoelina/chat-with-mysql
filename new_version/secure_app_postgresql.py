@@ -11,6 +11,9 @@ import logging
 from datetime import datetime
 import re
 
+# Import schema visualizer
+from schema_visualizer import show_schema_visualizer
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -371,6 +374,9 @@ def main():
     if st.sidebar.button("🗑️ Clear Chat"):
         st.session_state.messages = []
         st.rerun()
+    
+    # Show schema visualizer
+    show_schema_visualizer()
     
     # Footer
     st.sidebar.markdown("---")
